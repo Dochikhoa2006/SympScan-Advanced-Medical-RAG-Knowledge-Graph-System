@@ -92,9 +92,9 @@ This README structure is inspired by data documentation guidelines from:
 - [Cornell University Data Sharing README Guide](https://data.research.cornell.edu/data-management/sharing/readme/)  
 
 
-This project utilizes the **Quora Question Pairs Dataset**, available on Kaggle:
+This project utilizes the **SympScan - Symptomps to Disease Dataset**, available on Kaggle:
 
-- [Quora Question Pairs](https://www.kaggle.com/datasets/behzadhassan/sympscan-symptomps-to-disease)
+- [SympScan - Symptomps to Disease](https://www.kaggle.com/datasets/behzadhassan/sympscan-symptomps-to-disease)
 
 ## Contact
 For inquiries regarding the architecture or medical dataset integration, contact [dochikhoa2006@gmail.com](mailto:dochikhoa2006@gmail.com).
