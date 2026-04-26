@@ -84,5 +84,17 @@ This project is licensed under the **CC-BY (Creative Commons Attribution)** lice
 ## Citation
 Do, Chi Khoa (2026). *SympScan: Advanced Medical RAG & Knowledge Graph System*.
 
+## Acknowledgements
+
+This README structure is inspired by data documentation guidelines from:
+
+- [Queen’s University README Template](https://guides.library.queensu.ca/ReadmeTemplate)  
+- [Cornell University Data Sharing README Guide](https://data.research.cornell.edu/data-management/sharing/readme/)  
+
+
+This project utilizes the **Quora Question Pairs Dataset**, available on Kaggle:
+
+- [Quora Question Pairs](https://www.kaggle.com/datasets/behzadhassan/sympscan-symptomps-to-disease)
+
 ## Contact
 For inquiries regarding the architecture or medical dataset integration, contact [dochikhoa2006@gmail.com](mailto:dochikhoa2006@gmail.com).

@@ -205,6 +205,3 @@ if __name__ == '__main__':
 
 
 
-
-
-# https://www.kaggle.com/datasets/behzadhassan/sympscan-symptomps-to-disease
