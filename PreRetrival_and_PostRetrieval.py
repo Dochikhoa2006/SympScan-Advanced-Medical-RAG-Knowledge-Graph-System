@@ -1,0 +1,246 @@
+from langchain_ollama import OllamaLLM
+import re
+
+class Context_Processer:
+
+    def __init__ (self):
+
+        self.llm = OllamaLLM (model = "qwen2.5:0.5b-instruct-q5_k_m")
+
+    def entity_extraction (self, hypothetical_answer_list, do_graph_search):
+        
+        if not do_graph_search:
+            return ""
+        
+        entities_list = []
+        for user_query in hypothetical_answer_list:
+
+            prompt = f""" System: You are an expert Medical Entity Extractor.
+                
+                Task: Identify entities from the following categories:
+                - DISEASE: Pathological conditions, illnesses, or symptoms (e.g., Hypertension, Fever).
+                - MEDICATION: Drugs, pharmaceuticals, or treatments (e.g., Insulin, Aspirin).
+
+                Rules:
+                1. Only extract entities mentioned in the query.
+                2. Normalize terms to their standard medical names if possible.
+                3. If no entities are found, return an empty list.
+
+                Output Format Example:
+                Query: "Is Ibuprofen okay for my migraine?"
+                Output: DISEASE: ["Ibuprofen", "Migraine"] & MEDICATION: ["Insulin", "Aspirin"]
+
+                Query: "{user_query}"
+                Output: (YOUR RESPONSE)
+            """
+            
+            response = self.llm.invoke (prompt)
+
+            if "DISEASE:" in response:
+                disease = response.split ("DISEASE:")
+                disease = disease[-1].strip ()
+                disease_entities = re.findall (r'"([^"]*)"', disease)
+            else: 
+                disease_entities = re.findall (r'"([^"]*)"', response)
+
+            if "MEDICATION:" in response:
+                medication = response.split ("MEDICATION:")
+                medication = medication[-1].strip ()
+                medication_entities = re.findall (r'"([^"]*)"', medication)
+            else: 
+                medication_entities = re.findall (r'"([^"]*)"', response)
+
+            if disease_entities == medication_entities:
+                medication_entities = ""
+
+            disease_entities = [entity.lower ().strip () for entity in disease_entities]
+            medication_entities = [entity.lower ().strip () for entity in medication_entities]
+
+            entities_list.append ([disease_entities, medication_entities])
+        
+        return entities_list
+
+    def user_query_understanding (self, user_query, chat_history, do_expansion, do_rewrite, do_HyDE, replace_query_by_HyDE):
+
+        intent = self.intent_detection (user_query, chat_history)
+
+        if do_rewrite:
+            rewrite_query = self.rewrite (user_query, chat_history)
+        else:
+            rewrite_query = user_query
+
+        if intent == "RAG_SEARCH":
+            if do_expansion:
+                expand_query = self.expansion (rewrite_query, chat_history)
+            else:
+                expand_query = [rewrite_query]
+            
+            if do_HyDE:
+                hypothetical_answer_list = self.HyDE (expand_query, chat_history, len (expand_query))
+            else:
+                hypothetical_answer_list = expand_query
+            
+            if replace_query_by_HyDE:
+                return hypothetical_answer_list, hypothetical_answer_list[0], intent
+
+            return hypothetical_answer_list, rewrite_query, intent
+
+        else:
+            return None, rewrite_query, intent
+    
+    def intent_detection (self, user_query, chat_history):
+        
+        prompt = f""" SYSTEM: You are an Intent Detection Agent for a RAG Query Processor. Analyze the user's input query and chat history to classify it into one of these exact categories: [RAG_SEARCH, CHITCHAT]. Base your decision on whether the query seeks document retrieval (RAG_SEARCH), casual conversation (CHITCHAT). Respond concisely with only the category.
+            
+            USER INPUT: {user_query}
+            CHAT HISTORY: {chat_history}
+
+            Return your response in the following format:
+            CATEGORY: (TYPE)
+        """
+
+        response = self.llm.invoke (prompt)
+        response = response.strip ().upper ()
+
+        if "CHITCHAT" in response:
+            return "CHITCHAT"
+        
+        return "RAG_SEARCH"
+
+    def rewrite (self, user_query, chat_history):
+
+        prompt = f"""SYSTEM: You are a Query Rewrite Agent for a RAG Query Processor. Take the user's follow-up question and preceding conversation history to create a single, standalone search query that encapsulates all necessary context from the chat. Ensure the rewrite is self-contained, concise, and optimized for retrieving relevant documents from a vector database. Ignore chit-chat or non-search intents.
+    
+            USER INPUT: {user_query}
+            CHAT HISTORY: {chat_history}
+
+            Return your response in the following format:
+            REWRITE: 
+        """
+        
+        response = self.llm.invoke (prompt)
+
+        if "REWRITE:" in response:
+            response = response.split ("REWRITE:")[-1].strip ()
+            response = re.split (r'\n', response)[0].strip ()
+        else:
+            return response.strip()
+
+        return response
+
+    def expansion (self, rewritten_query, chat_history):
+
+        prompt = f""" SYSTEM: You are a Query Expansion Agent for a RAG Query Processor. Given a standalone rewritten query, generate exactly 1 variation of it. Each variation should be a slight rephrasing or expansion to capture synonyms, related terms, or alternative framings that maximize retrieval of relevant documents from a vector database. Keep them concise and focused on the core information need.
+            
+            USER INPUT: {rewritten_query}
+            CHAT HISTORY: {chat_history}
+
+            Return your response in the following format:
+            EXPANSIONS: 
+            1. (Variation 1)
+        """
+        
+        response = self.llm.invoke (prompt)
+
+        if "1." in response:
+            response = response.split ("1.")
+        elif "EXPANSIONS:" in response:
+            response = response.split ("EXPANSIONS:")
+        else:
+            return [response.strip (), rewritten_query]
+        
+        return [response[-1].strip (), rewritten_query]
+
+    def HyDE (self, expansion_rewrite, chat_history, hyde):
+
+        prompt = f""" SYSTEM: You are a Hypothetical Answer Agent for a RAG Query Processor. Generate a concise, expert hypothetical answer for 1 query provided.
+            
+            CHAT HISTORY: {chat_history}
+            EXPANSIONS: {expansion_rewrite[0]}
+
+            Output Format: (1-3 sentences)
+        """
+        
+        response = self.llm.invoke (prompt)
+        hypothetical_answer_list = [response.strip ()]
+
+        while len (hypothetical_answer_list) < hyde:
+            hypothetical_answer_list.append (expansion_rewrite[-1])
+
+        return hypothetical_answer_list[ : hyde]
+
+    def extractive_compression (self, rewritten_query, chunk_content_list):
+
+        summary = ""
+        for chunk_content in chunk_content_list:
+
+            prompt = f""" SYSTEM: You are a Medical Data Analyst. Your task is to summarize the provided document chunk specifically in the context of the user's search query. 
+                Extract only the clinical facts, diagnostic criteria, or treatment protocols mentioned. 
+                Maintain professional medical terminology. If the chunk is not relevant to the query, respond with "NOT_RELEVANT".
+
+                REWRITTEN QUERY: {rewritten_query}
+                DOCUMENT CHUNK: {chunk_content}
+
+                SUMMARY: (Provide a concise, 2-5 sentence summary of the relevant medical facts)
+            """
+            response = self.llm.invoke (prompt)
+
+            if f"SUMMARY:" in response:
+                response = response.split (f"SUMMARY:")
+                response = response[-1]
+            
+            summary += f"- {response.strip ()}.\n"
+
+        return summary
+
+    def ordering (self, chunks, do_ordering, top_k_chunk = 5):
+
+        priority_chunks = ""
+        subordinate_chunks = ""
+        
+        if do_ordering and top_k_chunk <= len (chunks):
+            for idx1 in range (top_k_chunk):
+                chunk_content = chunks[idx1].page_content
+                priority_chunks += f"- {chunk_content}.\n"
+
+            for idx2 in range (top_k_chunk, len (chunks)):
+                chunk_content = chunks[idx2].page_content
+                subordinate_chunks += f"- {chunk_content}.\n"
+
+        else:
+            for idx in range (min (len (chunks), top_k_chunk)):
+                chunk_content = chunks[idx].page_content
+                priority_chunks += f"- {chunk_content}.\n"    
+        
+        if subordinate_chunks == "":
+            return [priority_chunks]
+        
+        return [priority_chunks, subordinate_chunks]
+
+    def context_retrieval_processing (self, chunks, rewritten_query, do_ordering, do_extractive_compression): 
+
+        chunk_content_ordered = self.ordering (chunks, rewritten_query, do_ordering)
+
+        if do_extractive_compression:
+            chunk_content_summarized = self.extractive_compression (rewritten_query, chunk_content_ordered)
+        elif len (chunk_content_ordered) == 2:
+            chunk_content_summarized = chunk_content_ordered[0] + chunk_content_ordered[1]
+        else:
+            chunk_content_summarized = chunk_content_ordered[0]
+
+        return chunk_content_summarized
+
+
+
+
+
+# cd '/Users/chikhoado/Desktop/PROJECTS/Medical Diagnosis'
+# /opt/homebrew/bin/python3.12 -m venv .venv
+# source .venv/bin/activate
+# pip install pandas regex rank_bm25 nltk contractions unicodedata
+# pip install langchain_experimental langchain_text_splitters langchain_core langchain_huggingface sentence-transformers
+# pip install langchain_community faiss-cpu
+# pip install -U langchain-ollama
+# ollama pull gemma2:2b
+# ollama pull qwen2.5:0.5b-instruct-q5_k_m
+# python '/Users/chikhoado/Desktop/PROJECTS/Medical Diagnosis/PreRetrival_and_PostRetrieval.py'

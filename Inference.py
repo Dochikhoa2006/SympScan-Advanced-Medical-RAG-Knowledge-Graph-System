@@ -1,0 +1,83 @@
+from Hybrid_Dual_Indexing import Keyword_Search, Semantic_Search
+from Augmented_Generation import RAG
+import streamlit as st
+import time
+
+
+st.set_page_config (page_title = "Healthcare Chatbot", page_icon = "🤖")
+
+@st.cache_resource
+def load_rag ():
+    return RAG ()
+
+if "rag_ready" not in st.session_state:
+    placeholder = st.empty ()
+
+    with placeholder.container ():
+        st.warning ("⚠️ **THIS MEDICAL RAG SYSTEM SHOULD TAKE 60s TO LOAD ! APOLOGIZE FOR THE SLOW.**")
+        rag = load_rag ()
+        
+    placeholder.empty ()
+    st.session_state.rag_ready = True
+else:
+    rag = load_rag ()
+
+st.title ("🤖 Healthcare AI Assistant with RAG")
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+for message in st.session_state.messages:
+    with st.chat_message (message["role"]):
+        st.markdown (message["content"])
+
+if prompt := st.chat_input ("Ask me anything..."):
+    st.chat_message ("user").markdown (prompt)
+    st.session_state.messages.append ({"role": "user", "content": prompt})
+
+    with st.chat_message ("assistant"):
+        with st.status ("Analyzing...", expanded = False) as status:
+            time.sleep (1.0)
+            
+            status.update (label = "Retrieving...", state = "running")
+            time.sleep (1.0) 
+            
+            status.update (label = "Feedback loop...", state = "running")
+            
+            try:
+                response = rag.RAG_Online_Phase (prompt)
+                status.update (label = "Analysis Complete", state = "complete")
+                
+            except Exception as e:
+                status.update (label = "Error Occurred", state = "error")
+                st.error (f"An error occurred: {e}")
+                response = None
+
+        if response:
+            st.markdown (response)
+            st.session_state.messages.append ({"role": "assistant", "content": response})
+
+        rag.RAG_PostOnline_Phase()
+
+with st.sidebar:
+    st.header ("Settings")
+
+    if st.button ("Clear Chat History"):
+        if hasattr (rag, 'chat_history'):
+            rag.chat_history = "No prior conversation"
+
+        st.session_state.messages = []
+        st.rerun ()
+
+
+
+
+
+# cd '/Users/chikhoado/Desktop/PROJECTS/Medical Diagnosis'
+# /opt/homebrew/bin/python3.12 -m venv .venv
+# source .venv/bin/activate
+# pip install pandas regex rank_bm25 nltk contractions unicodedata
+# pip install langchain_experimental langchain_text_splitters langchain_core langchain_huggingface sentence-transformers
+# pip install langchain_community faiss-cpu
+# pip install -U langchain-ollama
+# ollama pull llama3
+# streamlit run Inference.py
