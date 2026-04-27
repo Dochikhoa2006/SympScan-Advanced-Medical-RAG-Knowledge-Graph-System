@@ -111,24 +111,13 @@ class Knowledge_Graphbase:
                 for relationship in result:
                     file.write (relationship["cypherStatements"])
 
-    def load_local (self, path = "neo4j.cypher"):
-            
-        with open (path, "r") as file:
-                raw_content = file.read ()
+    def load_local (self):
 
-        content = re.sub (r'^:.*$', '', raw_content)
-        statements = re.split (r';\s*\n', content)
-            
-        with self.driver.session () as session:
+        with self.driver.session() as session:
+
             session.run ("MATCH (n) DETACH DELETE n")
             session.run ("CALL apoc.schema.assert ({}, {})")
-
-            for statement in statements:
-                statement_cleaned = statement.strip ()
-
-                if not statement_cleaned or statement_cleaned.startswith (':'):
-                    continue
-                session.run (statement_cleaned)
+            session.run( "CALL apoc.cypher.runFile ('neo4j.cypher')")
 
 
 if __name__ == '__main__':

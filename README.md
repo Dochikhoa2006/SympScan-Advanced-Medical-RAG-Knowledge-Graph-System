@@ -53,30 +53,25 @@ While the vector database provides descriptive context, the `Knowledge_Graph.py`
 * **Local LLM**: [Ollama](https://ollama.com/) installed and running.
 * **Environment**: Python 3.10+
 
-### Setup
+### Set Up
 
-1.  **Initialize LLMs:**
+1.  **Clone the Repository**:
     ```bash
-    ollama pull qwen2.5:0.5b-instruct-q5_k_m
-    ollama pull llama3
+    cd "Your Directory"
+    git clone https://github.com/Dochikhoa2006/SympScan-Advanced-Medical-RAG-Knowledge-Graph-System.git
     ```
 
-2.  **Data Preprocessing:**
-    ```bash
-    python Raw_Dataset_PreProcess.py
-    python Hybrid_Dual_Indexing.py
-    ```
+2.  **Docker**:
+    * Container Instantiation / Orchestration:
+        ```bash
+        docker-compose up --build
+    * Chatbot UI (access 1 suitable URL):
+        ```bash
+        Local URL: http://localhost:8501
+        Network URL: http://xxx.xx.x.x:xxxx
+        External URL: http://yyy.yy.y.y:yyyy
+        ```
 
-3.  **Database Population:** Ensure Neo4j is running
-    ```bash
-    python Vector_Database.py
-    python Knowledge_Graph.py
-    ```
-
-4.  **Launch Interface:**
-    ```bash
-    streamlit run Inference.py
-    ```
 
 ## License
 This project is licensed under the **CC-BY (Creative Commons Attribution)** license.

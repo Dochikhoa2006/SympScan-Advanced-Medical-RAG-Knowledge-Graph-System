@@ -1,0 +1,39 @@
+services:
+    my-neo4j:
+        image: neo4j:latest
+        container_name: medical-neo4j-db
+        ports:
+        - "7474:7474"
+        - "7687:7687"
+        environment:
+        - NEO4J_AUTH=neo4j/MedicalKnowledgeGraph
+        - NEO4J_PLUGINS=["apoc"]
+        - NEO4J_dbms_security_procedures_unrestricted=apoc.*
+        - NEO4J_apoc_import_file_enabled=true
+        volumes:
+        - ./neo4j.cypher:/var/lib/neo4j/import/neo4j.cypher
+        networks:
+        - rag-net
+
+    app:
+        build: .
+        image: healthcare-rag-system:latest
+        container_name: medical-rag-interface
+        volumes:
+        - .:/app  
+        working_dir: /app
+        ports:
+        - "8501:8501"
+        environment:
+        - AUTH=MedicalKnowledgeGraph
+        - NEO4J_URI=bolt://my-neo4j:7687
+        - OLLAMA_BASE_URL=http://host.docker.internal:11434
+        command: streamlit run Inference.py
+        depends_on:
+        - my-neo4j
+        networks:
+        - rag-net
+
+networks:
+    rag-net:
+        driver: bridge
