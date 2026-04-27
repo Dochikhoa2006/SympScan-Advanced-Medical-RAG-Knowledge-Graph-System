@@ -1,0 +1,16 @@
+langchain-ollama
+langchain-experimental
+langchain-huggingface
+langchain-core
+langchain-community
+pyspark
+nltk
+rank_bm25
+contractions
+joblib
+streamlit
+neo4j
+python-dotenv
+sentence-transformers
+faiss-cpu
+pandas
