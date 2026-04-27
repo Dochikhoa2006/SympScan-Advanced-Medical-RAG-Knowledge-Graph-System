@@ -6,12 +6,12 @@ import re
 
 spark = SparkSession.builder.appName ('Parquet').getOrCreate ()
 
-disease_description = pd.read_csv ('/Users/chikhoado/Desktop/PROJECTS/Medical Diagnosis/SympScan/description.csv')
-disease_medication_encouragement = pd.read_csv ('/Users/chikhoado/Desktop/PROJECTS/Medical Diagnosis/SympScan/medications.csv')
-disease_diet_encouragement = pd.read_csv ('/Users/chikhoado/Desktop/PROJECTS/Medical Diagnosis/SympScan/diets.csv')
-disease_workout_encouragement = pd.read_csv ('/Users/chikhoado/Desktop/PROJECTS/Medical Diagnosis/SympScan/workout.csv')
-disease_and_precaution = pd.read_csv ('/Users/chikhoado/Desktop/PROJECTS/Medical Diagnosis/SympScan/precautions.csv')
-disease_and_symptom = pd.read_csv ('/Users/chikhoado/Desktop/PROJECTS/Medical Diagnosis/SympScan/Diseases_and_Symptoms_dataset.csv')
+disease_description = pd.read_csv ('SympScan/description.csv')
+disease_medication_encouragement = pd.read_csv ('SympScan/medications.csv')
+disease_diet_encouragement = pd.read_csv ('SympScan/diets.csv')
+disease_workout_encouragement = pd.read_csv ('SympScan/workout.csv')
+disease_and_precaution = pd.read_csv ('SympScan/precautions.csv')
+disease_and_symptom = pd.read_csv ('SympScan/Diseases_and_Symptoms_dataset.csv')
 
 disease_and_symptom_column = disease_and_symptom.columns
 array_json_text = []

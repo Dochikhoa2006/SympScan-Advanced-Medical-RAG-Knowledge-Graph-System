@@ -3,10 +3,13 @@ langchain-experimental
 langchain-huggingface
 langchain-core
 langchain-community
+langchain
+torch
 pyspark
 nltk
 rank_bm25
 contractions
+unicodedata2
 joblib
 streamlit
 neo4j
@@ -14,3 +17,4 @@ python-dotenv
 sentence-transformers
 faiss-cpu
 pandas
+regex

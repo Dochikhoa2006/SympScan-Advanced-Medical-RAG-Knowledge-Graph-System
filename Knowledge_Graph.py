@@ -111,7 +111,7 @@ class Knowledge_Graphbase:
                 for relationship in result:
                     file.write (relationship["cypherStatements"])
 
-    def load_local (self, path = "/Users/chikhoado/Desktop/PROJECTS/Medical Diagnosis/neo4j.cypher"):
+    def load_local (self, path = "neo4j.cypher"):
             
         with open (path, "r") as file:
                 raw_content = file.read ()
