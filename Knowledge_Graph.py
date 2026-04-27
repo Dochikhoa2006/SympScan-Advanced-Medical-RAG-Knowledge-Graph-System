@@ -8,7 +8,7 @@ import re
 
 class Knowledge_Graphbase:
 
-    def __init__ (self, connection_URI = "neo4j://127.0.0.1:7687", user = "neo4j"):
+    def __init__ (self, connection_URI = "bolt://my-neo4j:7687", user = "neo4j"):
 
         load_dotenv ()
         password = os.getenv ("AUTH")

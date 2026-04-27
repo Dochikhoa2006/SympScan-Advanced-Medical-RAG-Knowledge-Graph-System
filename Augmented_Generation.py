@@ -10,7 +10,7 @@ import re
 
 class RAG:
 
-    def __init__ (self, model = "qwen2.5:0.5b-instruct-q5_k_m", log_file_path = "Chat_History.log"):
+    def __init__ (self, model = "qwen2.5:0.5b-instruct-q5_k_m", base_url = "http://host.docker.internal:11434", log_file_path = "Chat_History.log"):
 
         self.log_file_path = log_file_path
         self.chat_history = "No prior conversation"
@@ -23,7 +23,7 @@ class RAG:
         self.graph_text = ""
         self.intent = ""
 
-        self.llm = OllamaLLM (model = model)
+        self.llm = OllamaLLM (model = model, base_url = base_url)
         self.retriever = Retriever ()
         self.context_processer = Context_Processer ()
         logging.basicConfig (filename = log_file_path, level = logging.INFO)

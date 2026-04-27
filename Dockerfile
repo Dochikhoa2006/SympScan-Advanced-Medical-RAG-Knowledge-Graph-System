@@ -6,5 +6,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN python -c "import nltk; nltk.download('punkt'); nltk.download('wordnet')"
 COPY . .
 EXPOSE 8501
+ENV FORCE_CPU=true
 ENV TORCH_DEVICE=cpu
 CMD ["streamlit", "run", "Inference.py"]

@@ -2,6 +2,7 @@ from Hybrid_Dual_Indexing import Keyword_Search, Semantic_Search
 from Knowledge_Graph import Knowledge_Graphbase
 from Vector_Database import Vector_DB
 from sentence_transformers import CrossEncoder
+import torch
 import joblib
 
 
@@ -9,9 +10,34 @@ class Retriever:
 
     def __init__ (self):
 
+        # ONLY THIS PART IS GENERATED FROM GEMINI TO MOVE MY 'file.pkl' FROM MPS (MACBOOK) TO CPU (LINUX) FOR DOCKER
+        # ------------------------------------------------------------------------------------------------------------
+        original_storage_init = torch.UntypedStorage.__new__
+        def patched_storage_new(cls, *args, **kwargs):
+            if 'device' in kwargs and kwargs['device'] == 'mps':
+                kwargs['device'] = 'cpu'
+            return original_storage_init(cls, *args, **kwargs)
+        
+        torch.UntypedStorage.__new__ = patched_storage_new
+        if not hasattr(torch.serialization, '_mps_deserialize'):
+            torch.serialization._mps_deserialize = lambda obj, location: obj.cpu()
+        try:
+            self.semantic_search_model = joblib.load ("Semantic_Model.pkl")
+            if hasattr (self.semantic_search_model, 'to'):
+                self.semantic_search_model.to ('cpu')
+
+        except Exception:
+            with open ("Semantic_Model.pkl", "rb") as file:
+                self.semantic_search_model = torch.load (
+                    file, 
+                    map_location='cpu', 
+                    weights_only=False
+            )
+        torch.UntypedStorage.__new__ = original_storage_init
+        # ------------------------------------------------------------------------------------------------------------
+
         self.rerank_model = CrossEncoder ("cross-encoder/ms-marco-MiniLM-L-6-v2")
         self.inverted_index = joblib.load ("Keyword_Model.pkl")
-        self.semantic_search_model = joblib.load ("Semantic_Model.pkl")
         self.vector_database = Vector_DB (self.semantic_search_model, "LOAD_DATABASE")
         self.knowledge_database = Knowledge_Graphbase ()
         self.knowledge_database.load_local ()

@@ -5,7 +5,7 @@ class Context_Processer:
 
     def __init__ (self):
 
-        self.llm = OllamaLLM (model = "qwen2.5:0.5b-instruct-q5_k_m")
+        self.llm = OllamaLLM (model = "qwen2.5:0.5b-instruct-q5_k_m", base_url = "http://host.docker.internal:11434")
 
     def entity_extraction (self, hypothetical_answer_list, do_graph_search):
         
