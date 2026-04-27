@@ -54,15 +54,3 @@ if __name__ == "__main__":
     Vector_DB = Vector_DB (semantic_search_model)
     Vector_DB.add_doc_to_vector_database (keyword_search_model)
     Vector_DB.save_vector_database ()
-
-
-
-
-
-# cd '/Users/chikhoado/Desktop/PROJECTS/Medical Diagnosis'
-# /opt/homebrew/bin/python3.12 -m venv .venv
-# source .venv/bin/activate
-# pip install pandas regex rank_bm25 nltk contractions unicodedata
-# pip install langchain_experimental langchain_text_splitters langchain_core langchain_huggingface sentence-transformers
-# pip install langchain_community faiss-cpu
-# python '/Users/chikhoado/Desktop/PROJECTS/Medical Diagnosis/Vector_Database.py'

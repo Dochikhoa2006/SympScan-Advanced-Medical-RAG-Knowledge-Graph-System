@@ -204,18 +204,3 @@ class Retriever:
             multi_query_graph_chunks = self.merge_multi_subgraph_cross_encoder (multi_query_graph_chunks, rewritten_query)
 
         return multi_query_graph_chunks
-
-
-
-
-
-
-# cd '/Users/chikhoado/Desktop/PROJECTS/Medical Diagnosis'
-# /opt/homebrew/bin/python3.12 -m venv .venv
-# source .venv/bin/activate
-# pip install pandas regex rank_bm25 nltk contractions unicodedata
-# pip install langchain_experimental langchain_text_splitters langchain_core langchain_huggingface sentence-transformers
-# pip install langchain_community faiss-cpu
-# pip install -U langchain-ollama
-# ollama pull llama3
-# python '/Users/chikhoado/Desktop/PROJECTS/Medical Diagnosis/Retrieval.py'

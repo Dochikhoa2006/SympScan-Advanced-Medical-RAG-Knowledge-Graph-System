@@ -229,18 +229,3 @@ class Context_Processer:
             chunk_content_summarized = chunk_content_ordered[0]
 
         return chunk_content_summarized
-
-
-
-
-
-# cd '/Users/chikhoado/Desktop/PROJECTS/Medical Diagnosis'
-# /opt/homebrew/bin/python3.12 -m venv .venv
-# source .venv/bin/activate
-# pip install pandas regex rank_bm25 nltk contractions unicodedata
-# pip install langchain_experimental langchain_text_splitters langchain_core langchain_huggingface sentence-transformers
-# pip install langchain_community faiss-cpu
-# pip install -U langchain-ollama
-# ollama pull gemma2:2b
-# ollama pull qwen2.5:0.5b-instruct-q5_k_m
-# python '/Users/chikhoado/Desktop/PROJECTS/Medical Diagnosis/PreRetrival_and_PostRetrieval.py'

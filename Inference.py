@@ -67,17 +67,3 @@ with st.sidebar:
 
         st.session_state.messages = []
         st.rerun ()
-
-
-
-
-
-# cd '/Users/chikhoado/Desktop/PROJECTS/Medical Diagnosis'
-# /opt/homebrew/bin/python3.12 -m venv .venv
-# source .venv/bin/activate
-# pip install pandas regex rank_bm25 nltk contractions unicodedata
-# pip install langchain_experimental langchain_text_splitters langchain_core langchain_huggingface sentence-transformers
-# pip install langchain_community faiss-cpu
-# pip install -U langchain-ollama
-# ollama pull llama3
-# streamlit run Inference.py

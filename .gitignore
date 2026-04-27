@@ -1,13 +1,11 @@
 __pycache__/
-*.py[cod]
-*$py.class
+.DS_Store
 .venv/
-venv/
-env/
 .env
-.vscode/
 
 SympScan
 *.pkl
 *.parquet
 *.log
+
+run_script

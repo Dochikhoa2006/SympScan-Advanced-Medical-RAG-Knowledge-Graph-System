@@ -192,16 +192,3 @@ if __name__ == '__main__':
         array_flatten_text.append (flatten_format)
 
     save_processed_dataset ()
-    
-
-
-
-
-# cd '/Users/chikhoado/Desktop/PROJECTS/Medical Diagnosis'
-# /opt/homebrew/bin/python3.12 -m venv .venv
-# source .venv/bin/activate
-# pip install pyspark pandas regex 
-# python '/Users/chikhoado/Desktop/PROJECTS/Medical Diagnosis/Raw_Dataset_PreProcess.py'
-
-
-

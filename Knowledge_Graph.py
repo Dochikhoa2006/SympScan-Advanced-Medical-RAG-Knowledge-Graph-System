@@ -141,14 +141,3 @@ if __name__ == '__main__':
     knowledge_graph = Knowledge_Graphbase ()
     knowledge_graph.construct_knowledge_graph (dataset, chunks)
     knowledge_graph.save_local ()
-
-
-
-
-
-
-# cd '/Users/chikhoado/Desktop/PROJECTS/Medical Diagnosis'
-# /opt/homebrew/bin/python3.12 -m venv .venv
-# source .venv/bin/activate
-# pip install pyspark pandas neo4j regex python-dotenv
-# python '/Users/chikhoado/Desktop/PROJECTS/Medical Diagnosis/Knowledge_Graph.py'
